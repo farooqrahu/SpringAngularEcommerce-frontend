@@ -11,7 +11,7 @@ import { ApiResponse } from './register/api-response';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthenticationService {  
+export class AuthenticationService {
   constructor(private http: HttpClient, private $localStorage: LocalStorageService) { }
 
   login(loginPayload: LoginPayload): Observable<boolean> {
@@ -27,7 +27,7 @@ export class AuthenticationService {
       return data;
     }));
   }
-  
+
   logout(): Observable<any> {
     return new Observable(observer => {
       this.$localStorage.clear('authenticationToken');
