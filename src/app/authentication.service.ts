@@ -16,8 +16,9 @@ export class AuthenticationService {
 
   login(loginPayload: LoginPayload): Observable<boolean> {
     return this.http.post<JwtAuthResponsePayload>('http://localhost:8080/api/auth/login', loginPayload).pipe(map(data => {
-      this.$localStorage.store('authenticationToken', data.accessToken);
-      this.$localStorage.store('user', data.username);
+     debugger
+      this.$localStorage.store('authenticationToken', data.token);
+      this.$localStorage.store('user', data.user.username);
       return true;
     }));
   }

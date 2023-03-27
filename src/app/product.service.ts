@@ -8,7 +8,7 @@ import { map } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
-export class ProductService {  
+export class ProductService {
   constructor(private http: HttpClient) { }
 
   getProductsByCategory(categoryName: string) {
@@ -31,11 +31,11 @@ export class ProductService {
 
     return this.http.post<ProductSearchResponseDto>('http://localhost:8080/api/store/catalog/'+categoryName + "/facets/filter", searchQueryDto).pipe(map(data => {
       return data;
-    }));    
+    }));
   }
 
   search(searchQueryDto: SearchQueryDto){
-    return this.http.post<ProductSearchResponseDto>('http://localhost:8080/api/store/catalog/search', searchQueryDto).pipe(map(data => {
+    return this.http.post<ProductSearchResponseDto>('http://localhost:8080/api/v1/product/search', searchQueryDto).pipe(map(data => {
       return data;
     }));
   }

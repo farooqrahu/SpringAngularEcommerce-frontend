@@ -1,9 +1,6 @@
 package com.rahu.springjwt.repository;
 
-import java.util.Optional;
-
-import com.rahu.springjwt.models.User;
-
+import com.rahu.springjwt.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,10 +8,17 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-  Optional<User> findByUsername(String username);
+
+	@Query("select u from User u where u.username=?1")
+	Optional<User> findByUsername(String username);
+	@Query("select u from User u")
+	List<User> findAllUsers();
+    Optional<User> findByEmail(String email);
 
   Optional<User> findByEmailIgnoreCase(String email);
 

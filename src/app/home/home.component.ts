@@ -10,8 +10,8 @@ export class HomeComponent implements OnInit {
 
   $products;
 
-  constructor(productService: ProductService) { 
-    this.$products = productService.getFeaturedProducts();
+  constructor(productService: ProductService) {
+    // this.$products = productService.getFeaturedProducts();
   }
 
   ngOnInit() {

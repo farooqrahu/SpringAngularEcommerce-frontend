@@ -2,7 +2,7 @@ package com.rahu.springjwt.payload.response;
 
 import java.util.List;
 
-import com.rahu.springjwt.models.Category;
+import com.rahu.springjwt.model.Category;
 
 import lombok.Data;
 

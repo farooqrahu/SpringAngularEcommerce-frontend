@@ -1,6 +1,6 @@
 package com.rahu.springjwt.payload.response;
 
-import com.rahu.springjwt.models.Company;
+import com.rahu.springjwt.model.Company;
 import lombok.Data;
 
 import java.util.List;

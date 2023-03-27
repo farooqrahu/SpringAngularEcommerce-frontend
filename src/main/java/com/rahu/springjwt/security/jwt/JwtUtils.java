@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.rahu.springjwt.model.User;
 import com.rahu.springjwt.security.services.UserDetailsImpl;
 
 import io.jsonwebtoken.*;
@@ -24,7 +25,7 @@ public class JwtUtils {
   @Value("${rahu.app.jwtExpirationMs}")
   private int jwtExpirationMs;
 
-  public String generateToken(UserDetailsImpl userLoginDetails) {
+  public String generateToken(User userLoginDetails) {
     Map<String, Object> claims = new HashMap<>();
     claims.put("user_id", userLoginDetails.getId());
     claims.put("jwt_sign", userLoginDetails.getJwtSign());

@@ -1,20 +1,14 @@
 package com.rahu.springjwt.dto;
 
-import com.rahu.springjwt.models.Category;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CategoryDto {
-  private Long id;
+
   private String name;
-
-
-  public static CategoryDto factoryCategoryDto(Category category){
-    return CategoryDto.builder().id(category.getId()).name(category.getName()).build();
-  }
-
+  private String icon;
 }

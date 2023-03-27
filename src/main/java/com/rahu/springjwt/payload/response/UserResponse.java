@@ -1,7 +1,7 @@
 package com.rahu.springjwt.payload.response;
 
 import com.rahu.springjwt.dto.UserDto;
-import com.rahu.springjwt.models.User;
+import com.rahu.springjwt.model.User;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +16,6 @@ public class UserResponse {
   private UserDto user;
 
   public static UserResponse userResponseFactory(User user, String token) {
-    return UserResponse.builder().token(token).user(UserDto.userDtoFactory(user)).build();
+    return UserResponse.builder().token(token).user(UserDto.factoryUserDto(user)).build();
   }
 }

@@ -1,7 +1,7 @@
 package com.rahu.springjwt.payload.request;
 
-import com.rahu.springjwt.models.Category;
-import com.rahu.springjwt.models.Company;
+import com.rahu.springjwt.model.Category;
+import com.rahu.springjwt.model.Company;
 import lombok.Data;
 
 @Data

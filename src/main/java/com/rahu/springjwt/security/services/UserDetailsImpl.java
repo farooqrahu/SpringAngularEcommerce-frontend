@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.validation.constraints.Size;
 
-import com.rahu.springjwt.models.User;
+import com.rahu.springjwt.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.springframework.lang.Nullable;

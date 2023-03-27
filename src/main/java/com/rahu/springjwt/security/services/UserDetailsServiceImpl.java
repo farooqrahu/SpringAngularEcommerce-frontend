@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.rahu.springjwt.models.*;
+import com.rahu.springjwt.model.ConfirmationToken;
+import com.rahu.springjwt.model.ERole;
+import com.rahu.springjwt.model.Role;
+import com.rahu.springjwt.model.User;
 import com.rahu.springjwt.payload.request.LoginRequest;
 import com.rahu.springjwt.payload.request.SignupRequest;
 import com.rahu.springjwt.payload.request.UpdateRequest;
@@ -12,13 +15,11 @@ import com.rahu.springjwt.payload.response.MessageResponse;
 import com.rahu.springjwt.payload.response.UserListResponse;
 import com.rahu.springjwt.payload.response.UserResponse;
 import com.rahu.springjwt.repository.ConfirmationTokenRepository;
-import com.rahu.springjwt.repository.FileDBRepository;
 import com.rahu.springjwt.repository.RoleRepository;
 import com.rahu.springjwt.repository.UserRepository;
 import com.rahu.springjwt.security.CustomAuthenticationProvider;
 import com.rahu.springjwt.security.jwt.JwtUtils;
 
-import com.rahu.springjwt.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -51,30 +52,26 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   @Autowired
   UserRepository userRepository;
   @Autowired
-  private FileDBRepository fileDBRepository;
-  @Autowired
   RoleRepository roleRepository;
-  @Autowired
-  ProductService productService;
-  @Autowired
-  ConfirmationTokenRepository confirmationTokenRepository;
-  @Autowired
-  EmailSenderService emailSenderService;
   @Value("${upload.path}")
   private String uploadPath;
   @Autowired
   private JwtUtils jwtToken;
+  private final ConfirmationTokenRepository confirmationTokenRepository;
+
+  public UserDetailsServiceImpl(ConfirmationTokenRepository confirmationTokenRepository) {
+    this.confirmationTokenRepository = confirmationTokenRepository;
+  }
 
   @Override
   @Transactional
   public UserDetailsImpl loadUserByUsername(String username) throws UsernameNotFoundException {
 
     User user = userRepository.findByUsername(username)
-        .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+      .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
     return UserDetailsImpl.build(user);
 
   }
-
 
 
   public ResponseEntity<?> getAllUsers() {
@@ -103,7 +100,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   }
 
   public ResponseEntity<?> authenticateUser(LoginRequest loginRequest) throws Exception {
-    authenticate(loginRequest.getUsername(),loginRequest.getPassword());
+    authenticate(loginRequest.getUsername(), loginRequest.getPassword());
     Optional<User> user = userRepository.findByUsernameIgnoreCase(loginRequest.getUsername());
     if (user.isEmpty() || Objects.equals(user.get().getStatus(), "Deleted"))
       return ResponseEntity.badRequest().body(new MessageResponse("Error:Account does not exist"));
@@ -111,8 +108,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
       return ResponseEntity.badRequest().body(new MessageResponse("Error:Account Banned"));
     updateJwtSign(user);
 
-    final UserDetailsImpl userDetails = loadUserByUsername(loginRequest.getUsername());
-    final String token = jwtToken.generateToken(userDetails);
+//    final UserDetailsImpl userDetails = loadUserByUsername(loginRequest.getUsername());
+//    final UserDetailsImpl userDetails =UserDetailsImpl.build(user.get());
+    final String token = jwtToken.generateToken(user.get());
 //    user = userRepository.findById(userDetails.getId());
     if (user.get().getStatus().equals("Activation pending")) {
       SignupRequest signupRequest = new SignupRequest();
@@ -120,13 +118,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
       signupRequest.setPassword(loginRequest.getPassword());
       this.sendNewConfirmationToken(signupRequest);
       return ResponseEntity.badRequest()
-          .body(new MessageResponse("Error: Account not verified, please check your email for a new activation link"));
+        .body(new MessageResponse("Error: Account not verified, please check your email for a new activation link"));
     }
 
     if (!user.get().getStatus().equals("Activated"))
       return ResponseEntity.badRequest().body(new MessageResponse("Error: please verify your account"));
-    return ResponseEntity.ok(UserResponse.userResponseFactory(user.get(),token));
+    return ResponseEntity.ok(UserResponse.userResponseFactory(user.get(), token));
   }
+
   /**
    * the following method is used to authenticate the given user
    *
@@ -143,6 +142,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
       throw new BadCredentialsException("INVALID_CREDENTIALS", e);
     }
   }
+
   public ResponseEntity<?> registerUser(SignupRequest signUpRequest) {
 
     if (userRepository.existsByUsername(signUpRequest.getUsername())) {
@@ -153,10 +153,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
     if (signUpRequest.getPassword().length() < 6)
       return ResponseEntity.badRequest()
-          .body(new MessageResponse("Error: Password must not be empty or less than 6 characters"));
+        .body(new MessageResponse("Error: Password must not be empty or less than 6 characters"));
 
     User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
-        encoder.encode(signUpRequest.getPassword()));
+      encoder.encode(signUpRequest.getPassword()));
     Set<Role> roles = new HashSet<>();
     Role userRole = roleRepository.findByName(ERole.ROLE_USER).get();
     roles.add(userRole);
@@ -181,11 +181,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     mailMessage.setSubject("Complete Registration!");
     mailMessage.setFrom("farahu008@gmail.com");
     mailMessage.setText("To activate your account, please click here : " + "http://localhost:4200/#/login?token="
-        + confirmationToken.getConfirmationToken());
+      + confirmationToken.getConfirmationToken());
 //    emailSenderService.sendEmail(mailMessage);
 
     return ResponseEntity
-        .ok(new MessageResponse("verification link sent, please check your email to activate your account"));
+      .ok(new MessageResponse("verification link sent, please check your email to activate your account"));
 
   }
 
@@ -211,9 +211,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   public ResponseEntity<?> getUserInfo() {
     UserDetailsImpl userDetails = getUserDetails();
     User user = userRepository.findById(userDetails.getId()).get();
-    return ResponseEntity.ok(UserResponse.userResponseFactory(user,null));
+    return ResponseEntity.ok(UserResponse.userResponseFactory(user, null));
 
   }
+
   public User getUser() {
     UserDetailsImpl userDetails = getUserDetails();
     return userRepository.findById(userDetails.getId()).get();
@@ -223,7 +224,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     checkAdminOrConcernedUser(updateRequest.getId());
     UserDetailsImpl userDetails = getUserDetails();
     User user = userDetailsServiceImpl.saveUser(userDetails.getId(), updateRequest);
-    return ResponseEntity.ok(UserResponse.userResponseFactory(user,null));
+    return ResponseEntity.ok(UserResponse.userResponseFactory(user, null));
 
   }
 
@@ -246,27 +247,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     return userRepository.save(user);
   }
 
-  public void saveUserProfileImage(long id, MultipartFile image) {
-
-    User user = userRepository.findById(id).get();
-    try {
-      String fileName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
-      FileDB fileDB = new FileDB(fileName, image.getContentType(), image.getBytes());
-      user.setImage(true);
-      user.setFiles(fileDB);
-      fileDBRepository.save(fileDB);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    userRepository.save(user);
-  }
-
-  public ResponseEntity<?> updateUserProfilePicture(MultipartFile image) {
-    UserDetailsImpl userDetails = getUserDetails();
-    this.saveUserProfileImage(userDetails.getId(), image);
-    return ResponseEntity.ok(new MessageResponse("User updated successfully!"));
-  }
-
   public Authentication isAuthenticated() {
     return SecurityContextHolder.getContext().getAuthentication();
   }
@@ -280,7 +260,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     UserDetailsImpl userDetails = getUserDetails();
     return userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
   }
-
 
 
   public boolean isAdmin() {

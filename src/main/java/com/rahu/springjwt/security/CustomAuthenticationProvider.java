@@ -1,7 +1,7 @@
 package com.rahu.springjwt.security;
 
 
-import com.rahu.springjwt.models.User;
+import com.rahu.springjwt.model.User;
 import com.rahu.springjwt.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.rahu.springjwt.dto.UserDto;
-import com.rahu.springjwt.models.User;
+import com.rahu.springjwt.model.User;
 
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +23,7 @@ public class UserListResponse {
 
 
   public static UserListResponse userResponseFactory(List<User> users) {
-    return UserListResponse.builder().users(users.stream().map(UserDto::userDtoFactory).collect(Collectors.toList())).build();
+    return UserListResponse.builder().users(users.stream().map(UserDto::factoryUserDto).collect(Collectors.toList())).build();
   }
 
 }

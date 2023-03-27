@@ -10,8 +10,8 @@ export class BsNavbarComponent implements OnInit {
 
   categories$;
 
-  constructor(categoryService: CategoryService) { 
-    this.categories$ = categoryService.getCategories();
+  constructor(categoryService: CategoryService) {
+    // this.categories$ = categoryService.getCategories();
   }
 
   ngOnInit() {

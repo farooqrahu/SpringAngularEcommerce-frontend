@@ -1,14 +1,15 @@
 package com.rahu.springjwt;
 
-import com.rahu.springjwt.models.ERole;
-import com.rahu.springjwt.models.Role;
-import com.rahu.springjwt.models.User;
+import com.rahu.springjwt.model.Role;
+import com.rahu.springjwt.model.ERole;
+import com.rahu.springjwt.model.User;
 import com.rahu.springjwt.repository.CategoryRepository;
 import com.rahu.springjwt.repository.ProductRepository;
 import com.rahu.springjwt.repository.RoleRepository;
 import com.rahu.springjwt.repository.UserRepository;
-import com.rahu.springjwt.security.services.ProductService;
 import com.google.common.collect.Lists;
+import com.rahu.springjwt.service.ProductService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -82,17 +84,17 @@ public class SpringBootSecurityJwtApplication {
       Role r2 = new Role(ERole.ROLE_MODERATOR);
       Role r3 = new Role(ERole.ROLE_USER);
 
-      RoleRepository.save(r1);
-      RoleRepository.save(r2);
-      RoleRepository.save(r3);
+//      RoleRepository.save(r1);
+//      RoleRepository.save(r2);
+//      RoleRepository.save(r3);
       Set<Role> r = new HashSet<Role>();
       r.add(r1);
       r.add(r2);
       r.add(r3);
-      User user = new User("admin", "farahu2008@gmail.com", encoder.encode("Admin@123"), r);
+      User user = new User("admin", "farahu2008@gmail.com", encoder.encode("admin"), r);
       user.setName("Administrator");
       user.setStatus("Activated");
-      userRepository.save(user);
+//      userRepository.save(user);
       }
 
 //      RoleRepository.findAll().forEach(System.out::println);
@@ -160,5 +162,8 @@ public class SpringBootSecurityJwtApplication {
     return Lists.newArrayList(new SecurityReference("JWT", authorizationScopes));
   }
 
-
+@Bean
+  public ModelMapper modelMapper(){
+    return new ModelMapper();
+}
 }
